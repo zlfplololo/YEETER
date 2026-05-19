@@ -1,0 +1,38 @@
+{
+    "index":{
+        "en":[
+            "yeeter",
+            "Connection established...",
+            "Status: <span style=\"color: white;\" id = \"5\">Online</span>",
+            "Welcome to the bases for our feelings<span class=\"cursor\">_</span>"
+        ],
+        "ua":[
+            "їттер",
+            "Пiдключення встановленно...",
+            "Статус: <span style=\"color: white;\" id = \"5\">Онлайн</span>",
+            "Добро пожалувати до баз для наших емоцiй <span class=\"cursor\">_</span>"
+        ]
+    },
+    "error":{
+        "en":[
+            "this page also has a joke page",
+            "error 404 not found",
+            "Go Home"
+        ],
+        "ua":[
+            "ця страница також має сторiнку - шутку",
+            "ошибка 404 не знайдено",
+            "Додому"
+        ]
+    },
+    "errore":{
+        "en":[
+            "🎩 this page is a joke. to visit the real page click <a href=\"/error\">here</a>",
+            "error 107 page found"
+        ],
+        "ua":[
+            "🎩 ця сторiнка - шутка. щоб перейти до реальної сторiнки натиснiть <a href=\"/error\">тут</a>",
+            "ошибка 107 знайдено"
+        ]
+    }
+}

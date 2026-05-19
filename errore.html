@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #00ff41; /* Classic Matrix/Terminal Green */
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        /* The "Scanline" effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .container {
+            border: 2px solid #00ff41;
+            padding: 20px;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(0, 40, 0, 0.1);
+            text-align: center; /* Add this to center the link */
+        }
+        a {
+            color: #00ff41; /* Force it to stay green */
+        }
+        a:hover {
+            background-color: #00ff41;
+            color: #0a0a0a;
+        }
+        h1 { text-transform: uppercase; letter-spacing: 5px; }
+        .cursor { animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id = "2">error 107 page found</h1>
+    </div>
+    <div style="margin-top: 20px; font-size: 0.8em; ">
+        <!-- © 2026 all rights reserved. <br> -->
+        <p id = "1">🎩 this page is a joke. to visit the real page click <a href="/error">here</a></p>
+    </div>
+    <script>
+            let data = 0
+            let message = 0
+            let target = 0
+            let index = 0
+            let contents = []
+            let lange = document.cookie.split(";").find(row => row.startsWith("language=")).split("=")[1]
+            
+            async function fetchtranslate() {
+                let response = await fetch("translate")
+                data = await response.json()
+                console.log(data)
+                await translate()
+            }
+            function translate(){
+                selector = document.getElementById("items")
+                for (let i=1; i<3;i++){
+                    let selected = document.getElementById(i.toString());
+                    selected.innerHTML = data['errore'][lange][i-1]
+                }
+            }
+            function setcontents(){
+                for (let i=1; i<5;i++){
+                    target = document.getElementById(i.toString());
+                    contents.push(target.innerHTML)
+                    target.innerHTML = ""
+                }
+            }
+            
+            function typeMessage(elementId) {
+                return new Promise((resolve) => {
+                    let target = document.getElementById(elementId);
+                    if (!target) { resolve(); return; }
+
+                    
+                    let temp = document.createElement('div');
+                    temp.innerHTML = contents[elementId-1]; 
+                    
+                    
+                    target.innerHTML = "";
+                    
+                    
+                    async function typeNode(source, destination) {
+                        let nodes = source.childNodes;
+                        
+                        for (let node of nodes) {
+                            if (node.nodeType === Node.TEXT_NODE) {
+                                if (destination.classList.contains("do_write")) {
+                                    for (let char of node.nodeValue) {
+                                        destination.innerHTML += char;
+                                        await new Promise(r => setTimeout(r, 30)); 
+                                    }
+                                } else {
+                                    for (let char of node.nodeValue) {
+                                        destination.innerHTML += char; 
+                                    }
+                                }
+                            } else {
+                                
+                                
+                                let clone = node.cloneNode(false); 
+                                clone.innerHTML = "";
+                                destination.appendChild(clone);
+                                
+                                
+                                await typeNode(node, clone);
+                            }
+                        }
+                    }
+
+                    typeNode(temp, target).then(resolve);
+                });
+            }
+
+            
+            async function executeInOrder() {
+                await fetchtranslate()
+            }
+
+            window.onload = executeInOrder;
+    </script>
+</body>
+</html>

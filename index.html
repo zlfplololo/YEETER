@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #00ff41; 
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .top {
+            position: absolute;
+            top:0;
+            left: 0;
+            align-self: stretch;
+            width: 99.8%;
+            align-items: center;
+        }
+        
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .container {
+            border: 2px solid #00ff41;
+            padding: 20px;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(0, 40, 0, 0.1);
+            text-align: center;
+        }
+        .containerN {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(0, 40, 0, 0.1);
+            text-align: center;
+        }
+        .footnote {
+            display: flex;
+            justify-content: flex-end;
+            font-size: 11px;
+        }
+        input {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(0, 40, 0, 0.1);
+            text-align: center;
+            color:#00ff41;
+        }
+        select {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(0, 40, 0, 0.1);
+            text-align: center;
+            color:#00ff41;
+        }
+        a {
+            color: #00ff41; /* Force it to stay green */
+        }
+        a:hover {
+            background-color: #00ff41;
+            color: #0a0a0a;
+        }
+        h1 { text-transform: uppercase; letter-spacing: 5px; }
+        .cursor { animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div class="top containerN">
+        <p><a href="">Home</a> <a href="">About</a></p>
+    </div>
+    <div class="container">
+        <div class="footnote">
+            <select name="items" id="items", class="footnote">
+                <option value="en">English</option>
+                <option value="ua">Українська</option>
+            </select>
+        </div>
+        <h1 id="1"class="do_write">yeeter</h1>
+        <p id="2"class="do_write">> Connection established...</p>
+        <p id="3" class="do_write">> Status: <span style="color: white;">Online</span></p>
+        <p id="4" class="do_write">> Welcome to the bases for our feelings<span class="cursor">_</span></p>
+        <input type="text" id="search" name="fname">
+    </div>
+    <!-- <div style="margin-top: 20px; font-size: 0.8em;">
+        © 2026 all rights reserved.
+    </div> -->
+    <script>
+            let data = 0
+            let message = 0
+            let target = 0
+            let index = 0
+            let contents = []
+            let selector = document.getElementById("items")
+            
+            async function setselector() {
+                let lange = document.cookie.split(";").find(row => row.startsWith("language="))
+                if (lange === undefined) {
+                    return;
+                } else {
+                    selector.value = lange.split("=")[1]
+                }
+            }
+            
+            async function onchange() {
+                document.cookie = `language=${selector.value};path=/`;
+                translate()
+            }
+            selector.addEventListener("change", onchange)
+            async function fetchtranslate() {
+                let response = await fetch("translate")
+                data = await response.json()
+                console.log(data)
+                await translate()
+                await setcontents()
+            }
+            function translate(){
+                selector = document.getElementById("items")
+                for (let i=1; i<5;i++){
+                    let selected = document.getElementById(i.toString());
+                    selected.innerHTML = data['index'][selector.value][i-1]
+                }
+            }
+            function setcontents(){
+                for (let i=1; i<5;i++){
+                    target = document.getElementById(i.toString());
+                    contents.push(target.innerHTML)
+                    target.innerHTML = ""
+                }
+            }
+            
+            function typeMessage(elementId) {
+                return new Promise((resolve) => {
+                    let target = document.getElementById(elementId);
+                    if (!target) { resolve(); return; }
+
+                    
+                    let temp = document.createElement('div');
+                    temp.innerHTML = contents[elementId-1]; 
+                    
+                    
+                    target.innerHTML = "";
+                    
+                    
+                    async function typeNode(source, destination) {
+                        let nodes = source.childNodes;
+                        
+                        for (let node of nodes) {
+                            if (node.nodeType === Node.TEXT_NODE) {
+                                if (destination.classList.contains("do_write")) {
+                                    for (let char of node.nodeValue) {
+                                        destination.innerHTML += char;
+                                        await new Promise(r => setTimeout(r, 30)); 
+                                    }
+                                } else {
+                                    for (let char of node.nodeValue) {
+                                        destination.innerHTML += char; 
+                                    }
+                                }
+                            } else {
+                                
+                                
+                                let clone = node.cloneNode(false); 
+                                clone.innerHTML = "";
+                                destination.appendChild(clone);
+                                
+                                
+                                await typeNode(node, clone);
+                            }
+                        }
+                    }
+
+                    typeNode(temp, target).then(resolve);
+                });
+            }
+
+            
+            async function executeInOrder() {
+                await setselector()
+                await fetchtranslate()
+                let field = document.getElementById("search")
+                field.value = ""
+                for (let i = 1; i < 5; i++) {
+                    await typeMessage(i.toString());
+                }
+            }
+
+            window.onload = executeInOrder;
+    </script>
+</body>
+</html>

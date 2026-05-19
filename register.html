@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #00ff41; /* Classic Matrix/Terminal Green */
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        /* The "Scanline" effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .container {
+            border: 2px solid #00ff41;
+            padding: 20px;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(0, 40, 0, 0.1);
+            text-align: center;
+        }
+        .container .footnote {
+            text-align: right;
+            font-size: 9px;
+        }
+        a {
+            color: #00ff41; /* Force it to stay green */
+        }
+        input {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 5px #00ff41;
+            background: rgba(0, 40, 0, 0.1);
+            text-align: center;
+            color:#00ff41;
+        }
+        button {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 5px #00ff41;
+            background: rgba(0, 40, 0, 0.1);
+            text-align: center;
+            color:#00ff41;
+        }
+        button:hover {
+            background-color: #00ff41;
+            color: #0a0a0a;
+        }
+        a:hover {
+            background-color: #00ff41;
+            color: #0a0a0a;
+        }
+        .error {
+            color: rgb(165, 36, 36);
+        }
+        h1 { text-transform: uppercase; letter-spacing: 5px; }
+        .cursor { animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>register</h1>
+        <p>Name: <input type="text" id="name" name="fname"></p>
+        <p>Password: <input type="password" id="Password" name="fname"><input type="checkbox" id="show" class=""></p>
+        <p>Repeat password: <input type="password" id="Passwordrepeat" name="fname"></p>
+        <p id="error" class="error"></p>
+        <Button onclick="send()">register</Button>
+
+    </div>
+    <!-- <div style="margin-top: 20px; font-size: 0.8em;">
+        © 2026 all rights reserved.
+    </div> -->
+        <script>
+            let data = 0
+            let message = 0
+            let target = 0
+            let index = 0
+            let contents = []
+            let lange = document.cookie.split(";").find(row => row.startsWith("language=")).split("=")[1]
+            let checkbox = document.getElementById("show")
+            checkbox.addEventListener("change", show)
+            function show() {
+                let password = document.getElementById("Password")
+                let repeat = document.getElementById("Passwordrepeat")
+                if (password.type == "password"){
+                    password.type = "text"
+                    repeat.type = "text"
+                } else {
+                    password.type = "password"
+                    repeat.type = "password"
+                }
+            }
+            
+            async function send() {
+                let name = document.getElementById("name")
+                let password = document.getElementById("Password")
+                let repeat = document.getElementById("Passwordrepeat")
+                let errorbox = document.getElementById("error")
+                if (password.value == repeat.value) {
+                    let resulte = await fetch('/', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({"action": "account/create", "name": name.value, "password": password.value})
+                    })
+                    console.log(resulte)
+                    // let result = 0
+                    // if (result["status"] == 1) {
+                    //     pass
+                    // } else {
+                    //     switch (result['error']) {
+                    //         case ("at-unique"):
+                    //             errorbox.textContent = "This name is already taken. please choose a different name (Note: you can change the displayed name in the settings later)"
+                    //     }
+                    // }
+                } //else {
+                //     errorbox.textContent = "password not matching"
+                // }
+            }
+            async function fetchtranslate() {
+                let response = await fetch("translate")
+                data = await response.json()
+                console.log(data)
+                await translate()
+            }
+            function translate(){
+                selector = document.getElementById("items")
+                for (let i=1; i<1;i++){
+                    let selected = document.getElementById(i.toString());
+                    selected.innerHTML = data['error'][lange][i-1]
+                }
+            }
+            function setcontents(){
+                for (let i=1; i<5;i++){
+                    target = document.getElementById(i.toString());
+                    contents.push(target.innerHTML)
+                    target.innerHTML = ""
+                }
+            }
+            
+            function typeMessage(elementId) {
+                return new Promise((resolve) => {
+                    let target = document.getElementById(elementId);
+                    if (!target) { resolve(); return; }
+
+                    
+                    let temp = document.createElement('div');
+                    temp.innerHTML = contents[elementId-1]; 
+                    
+                    
+                    target.innerHTML = "";
+                    
+                    
+                    async function typeNode(source, destination) {
+                        let nodes = source.childNodes;
+                        
+                        for (let node of nodes) {
+                            if (node.nodeType === Node.TEXT_NODE) {
+                                if (destination.classList.contains("do_write")) {
+                                    for (let char of node.nodeValue) {
+                                        destination.innerHTML += char;
+                                        await new Promise(r => setTimeout(r, 30)); 
+                                    }
+                                } else {
+                                    for (let char of node.nodeValue) {
+                                        destination.innerHTML += char; 
+                                    }
+                                }
+                            } else {
+                                
+                                
+                                let clone = node.cloneNode(false); 
+                                clone.innerHTML = "";
+                                destination.appendChild(clone);
+                                
+                                
+                                await typeNode(node, clone);
+                            }
+                        }
+                    }
+
+                    typeNode(temp, target).then(resolve);
+                });
+            }
+
+            
+            async function executeInOrder() {
+                await fetchtranslate()
+            }
+
+            window.onload = executeInOrder;
+    </script>
+</body>
+</html>
