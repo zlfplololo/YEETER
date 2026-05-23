@@ -21,8 +21,7 @@ while True:
         # 5. Receive and send data
         data = client_socket.recv(1024)
         if not data:
-            client_socket.close()
-            continue
+            break
         print(f"Received: {data.decode()}")
         if re.match(r"GET /",data.decode().split('\n')[0]):
             if data.decode().split('\n')[0].split(' ')[1] == "/":
@@ -99,10 +98,11 @@ while True:
                     response_body = {"status": 1, "error": "None"}
                     response_body = json.dumps(response_body).encode("utf-8")
                     response = (
-                        "HTTP/1.1 200 OK\r\n"
-                        "Content-Type: application/json\r\n"
-                        "Access-Control-Allow-Origin: *\r\n"
-                        "Connection: close\r\n\r\n"
+                        "HTTP/1.1 200 OK\n"
+                        "Content-Type: application/json\n"
+                        f"Content-Length: {len(response_body)}\n"
+                        "Access-Control-Allow-Origin: *\n"
+                        "Connection: close\n\n"
                     ).encode("utf-8")
                     
                     client_socket.sendall(response + response_body)
@@ -110,14 +110,15 @@ while True:
                 except sqlite3.IntegrityError as e:
                     if "UNIQUE" in str(e) and "at" in str(e):
                         response_body = {"status": 0, "error": "at-unique"}
-                        response_body = json.dumps(response_body).encode("utf-8")
+                        response_body = json.dumps(response_body)
                         response = (
-                            "HTTP/1.1 200 OK\r\n"
-                            "Content-Type: application/json\r\n"
-                            "Access-Control-Allow-Origin: *\r\n"
-                            "Connection: close\r\n\r\n"
+                            "HTTP/1.1 200 OK\n"
+                            "Content-Type: application/json\n"
+                            f"Content-Length: {len(response_body)}\n"
+                            "Access-Control-Allow-Origin: *\n"
+                            "Connection: close\n\n"
                         ).encode("utf-8")
-                        client_socket.sendall(response + response_body)
+                        client_socket.sendall(response + response_body.encode("utf-8"))
                         client_socket.close()
                         table.close()
                     

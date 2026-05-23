@@ -118,18 +118,19 @@
                         body: JSON.stringify({"action": "account/create", "name": name.value, "password": password.value})
                     })
                     console.log(resulte)
-                    // let result = 0
-                    // if (result["status"] == 1) {
-                    //     pass
-                    // } else {
-                    //     switch (result['error']) {
-                    //         case ("at-unique"):
-                    //             errorbox.textContent = "This name is already taken. please choose a different name (Note: you can change the displayed name in the settings later)"
-                    //     }
-                    // }
-                } //else {
-                //     errorbox.textContent = "password not matching"
-                // }
+                    let result = await resulte.json()
+                    console.log(result)
+                    if (result["status"] == 1) {
+                        pass
+                    } else {
+                        switch (result['error']) {
+                            case ("at-unique"):
+                                 errorbox.textContent = "This name is already taken. please choose a different name (Note: you can change the displayed name in the settings later)"
+                         }
+                    }
+                } else {
+                    errorbox.textContent = "password not matching"
+                }
             }
             async function fetchtranslate() {
                 let response = await fetch("translate")
