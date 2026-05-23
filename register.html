@@ -65,6 +65,9 @@
         .error {
             color: rgb(165, 36, 36);
         }
+        .trans {
+            display: inline;
+        }
         h1 { text-transform: uppercase; letter-spacing: 5px; }
         .cursor { animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
@@ -72,10 +75,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>register</h1>
-        <p>Name: <input type="text" id="name" name="fname"></p>
-        <p>Password: <input type="password" id="Password" name="fname"><input type="checkbox" id="show" class=""></p>
-        <p>Repeat password: <input type="password" id="Passwordrepeat" name="fname"></p>
+        <h1 id = "1">register</h1>
+        <p><div id = "2" class = "trans">Name:</div> <input type="text" id="name" name="fname"></p>
+        <p><div id = "3" class = "trans">Password:</div> <input type="password" id="Password" name="fname"><input type="checkbox" id="show" class=""></p>
+        <p><div id = "4" class = "trans">Repeat password:</div> <input type="password" id="Passwordrepeat" name="fname"></p>
         <p id="error" class="error"></p>
         <Button onclick="send()">register</Button>
 
@@ -89,7 +92,7 @@
             let target = 0
             let index = 0
             let contents = []
-            let lange = document.cookie.split(";").find(row => row.startsWith("language=")).split("=")[1]
+            let lange = document.cookie.split("; ").find(row => row.startsWith("language=")).split("=")[1]
             let checkbox = document.getElementById("show")
             checkbox.addEventListener("change", show)
             function show() {
@@ -121,7 +124,7 @@
                     let result = await resulte.json()
                     console.log(result)
                     if (result["status"] == 1) {
-                        pass
+                        document.cookie = `UAT=${name.value};path=/`;
                     } else {
                         switch (result['error']) {
                             case ("at-unique"):
@@ -140,9 +143,9 @@
             }
             function translate(){
                 selector = document.getElementById("items")
-                for (let i=1; i<1;i++){
+                for (let i=1; i<5;i++){
                     let selected = document.getElementById(i.toString());
-                    selected.innerHTML = data['error'][lange][i-1]
+                    selected.innerHTML = data['register'][lange][i-1]
                 }
             }
             function setcontents(){
