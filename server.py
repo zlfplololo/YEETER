@@ -94,7 +94,7 @@ while True:
                     cursor = table.cursor()
                     cursor.execute("INSERT INTO users (at, name, password) VALUES (?,?,?)", (action['name'], action['name'], action['password']))
                     table.commit()
-                    table.close()
+                    
                     response_body = {"status": 1, "error": "None"}
                     response_body = json.dumps(response_body).encode("utf-8")
                     response = (
@@ -120,11 +120,59 @@ while True:
                         ).encode("utf-8")
                         client_socket.sendall(response + response_body.encode("utf-8"))
                         client_socket.close()
-                        table.close()
+                        
+            if action["action"] == "account/login":
+                table = sqlite3.connect('data.db')
+                cursor = table.cursor()
+                cursor.execute("SELECT password FROM users WHERE at = ?", (action["name"],))
+                resulte = cursor.fetchall()
+                if resulte == []:
+                    response_body = {"status": 0, "error": "n/u"}
+                    response_body = json.dumps(response_body)
+                    response = (
+                        "HTTP/1.1 200 OK\n"
+                        "Content-Type: application/json\n"
+                        f"Content-Length: {len(response_body)}\n"
+                        "Access-Control-Allow-Origin: *\n"
+                        "Connection: close\n\n"
+                    ).encode("utf-8")
+                    client_socket.sendall(response + response_body.encode("utf-8"))
+                    client_socket.close()
+                    continue
+                    
+                print(resulte)
+                table.commit()
+                
+                if action["password"] == resulte[0][0]:
+                    response_body = {"status": 1, "error": "None"}
+                    response_body = json.dumps(response_body).encode("utf-8")
+                    response = (
+                        "HTTP/1.1 200 OK\n"
+                        "Content-Type: application/json\n"
+                        f"Content-Length: {len(response_body)}\n"
+                        "Access-Control-Allow-Origin: *\n"
+                        "Connection: close\n\n"
+                    ).encode("utf-8")
+                    
+                    client_socket.sendall(response + response_body)
+                    client_socket.shutdown(socket.SHUT_WR)
+                else:
+                    response_body = {"status": 0, "error": "w/p"}
+                    response_body = json.dumps(response_body)
+                    response = (
+                        "HTTP/1.1 200 OK\n"
+                        "Content-Type: application/json\n"
+                        f"Content-Length: {len(response_body)}\n"
+                        "Access-Control-Allow-Origin: *\n"
+                        "Connection: close\n\n"
+                    ).encode("utf-8")
+                    client_socket.sendall(response + response_body.encode("utf-8"))
+                    client_socket.close()                
                     
         # 6. Close the connection
         client_socket.close()
     except Exception as e:
         print(type(e).__qualname__ + str(e))
         server_socket.close()
+        table.close()
         break

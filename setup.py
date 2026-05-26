@@ -8,6 +8,6 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS users(
                )''')
 # cursor.execute('''INSERT INTO users (at, name, password) VALUES ('ben', 'ben robinson', '123');''')
 # connection.commit()
-cursor.execute('''SELECT * FROM users''')
+cursor.execute('''SELECT password FROM users where at = 'mel' ''')
 print(cursor.fetchall())
 connection.close()

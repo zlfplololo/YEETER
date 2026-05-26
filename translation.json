@@ -4,13 +4,17 @@
             "yeeter",
             "Connection established...",
             "Status: <span style=\"color: white;\" id = \"5\">Online</span>",
-            "Welcome to the bases for our feelings<span class=\"cursor\">_</span>"
+            "Welcome to the bases for our feelings<span class=\"cursor\">_</span>",
+            "Home",
+            "About"
         ],
         "ua":[
             "їттер",
             "Пiдключення встановленно...",
             "Статус: <span style=\"color: white;\" id = \"5\">Онлайн</span>",
-            "Добро пожалувати до баз для наших емоцiй <span class=\"cursor\">_</span>"
+            "Добро пожалувати до баз для наших емоцiй <span class=\"cursor\">_</span>",
+            "Додому",
+            "О"
         ]
     },
     "error":{
@@ -40,13 +44,43 @@
             "register",
             "Name:",
             "Password:",
-            "Repeat password:"
+            "Repeat password:",
+            "register"
         ],
         "ua":[
             "регістрація",
-            "姓名：",
-            "密码：",
-            "重复密码："
+            "i'мя：",
+            "пароль：",
+            "повторiть пароль：",
+            "регістрація"
+        ]
+    },
+    "login":{
+        "en":[
+            "login",
+            "Name:",
+            "Password:",
+            "Repeat password:",
+            "login"
+        ],
+        "ua":[
+            "вход",
+            "i'мя：",
+            "пароль：",
+            "повторiть пароль：",
+            "вход"
+        ]
+    },
+    "about":{
+        "en":[
+            "about",
+            "this is just a school project, nothing 'bout us",
+            "Go Home"
+        ],
+        "ua":[
+            "о",
+            "це просто школьний проект, нiчого про нас",
+            "Додому"
         ]
     }
 }

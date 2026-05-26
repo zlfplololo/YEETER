@@ -80,7 +80,7 @@
         <p><div id = "3" class = "trans">Password:</div> <input type="password" id="Password" name="fname"><input type="checkbox" id="show" class=""></p>
         <p><div id = "4" class = "trans">Repeat password:</div> <input type="password" id="Passwordrepeat" name="fname"></p>
         <p id="error" class="error"></p>
-        <Button onclick="send()">register</Button>
+        <Button onclick="send()" id = "5">register</Button>
 
     </div>
     <!-- <div style="margin-top: 20px; font-size: 0.8em;">
@@ -124,6 +124,7 @@
                     let result = await resulte.json()
                     console.log(result)
                     if (result["status"] == 1) {
+                        errorbox.textContent = ""
                         document.cookie = `UAT=${name.value};path=/`;
                     } else {
                         switch (result['error']) {
@@ -143,7 +144,7 @@
             }
             function translate(){
                 selector = document.getElementById("items")
-                for (let i=1; i<5;i++){
+                for (let i=1; i<6;i++){
                     let selected = document.getElementById(i.toString());
                     selected.innerHTML = data['register'][lange][i-1]
                 }
@@ -203,6 +204,7 @@
 
             
             async function executeInOrder() {
+                document.getElementById("show").checked = false;
                 await fetchtranslate()
             }
 
