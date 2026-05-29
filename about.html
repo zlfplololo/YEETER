@@ -50,6 +50,34 @@
     </style>
 </head>
 <body>
+    <div class="top containerN">
+        <style>
+        .containerN {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(0, 40, 0, 0.1);
+            text-align: center;
+        }
+        .top {
+            position: absolute;
+            top:0;
+            left: 0;
+            align-self: stretch;
+            width: 99.8%;
+            align-items: center;
+        }
+        </style>
+        <p><a href="/" id = "1t">Home</a> <a href="/about" id = "2t">About</a> <span class = "trans" id = "3t">i am chineese</span></p>
+        <script>
+            function translatet(){
+                selector = document.getElementById("items")
+                for (let i=1; i<4;i++){
+                    let selected = document.getElementById(`${i.toString()}t`);
+                    selected.innerHTML = data['top'][lange][i-1]
+                }
+            }
+        </script>
+    </div>
     <div class="container">
         <h1 id = "1">about</h1>
         <p id = "2">this is just a school project, nothing 'bout us</p>
@@ -64,7 +92,11 @@
             let target = 0
             let index = 0
             let contents = []
-            let lange = document.cookie.split("; ").find(row => row.startsWith("language=")).split("=")[1]
+            if (localStorage.getItem("language") === null) {
+                lange = "en"
+            } else {
+                lange = localStorage.getItem("language")
+            }
             
             async function fetchtranslate() {
                 let response = await fetch("translate")
@@ -78,6 +110,7 @@
                     let selected = document.getElementById(i.toString());
                     selected.innerHTML = data['about'][lange][i-1]
                 }
+                translatet()
             }
             function setcontents(){
                 for (let i=1; i<5;i++){

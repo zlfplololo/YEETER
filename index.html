@@ -14,14 +14,6 @@
             margin: 0;
             overflow: hidden;
         }
-        .top {
-            position: absolute;
-            top:0;
-            left: 0;
-            align-self: stretch;
-            width: 99.8%;
-            align-items: center;
-        }
         
         body::before {
             content: " ";
@@ -37,12 +29,6 @@
         .container {
             border: 2px solid #00ff41;
             padding: 20px;
-            box-shadow: 0 0 15px #00ff41;
-            background: rgba(0, 40, 0, 0.1);
-            text-align: center;
-        }
-        .containerN {
-            border: 2px solid #00ff41;
             box-shadow: 0 0 15px #00ff41;
             background: rgba(0, 40, 0, 0.1);
             text-align: center;
@@ -73,6 +59,9 @@
             background-color: #00ff41;
             color: #0a0a0a;
         }
+        .trans {
+            display: inline;
+        }
         h1 { text-transform: uppercase; letter-spacing: 5px; }
         .cursor { animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
@@ -80,7 +69,47 @@
 </head>
 <body>
     <div class="top containerN">
-        <p><a href="" id = "5">Home</a> <a href="/about" id = "6">About</a></p>
+        <style>
+        .containerN {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(0, 40, 0, 0.1);
+            text-align: center;
+        }
+        .top {
+            position: absolute;
+            top:0;
+            left: 0;
+            align-self: stretch;
+            width: 99.8%;
+            align-items: center;
+        }
+        .buttone {
+            border: 0px solid #00ff41;
+            box-shadow: 0 0 0px #00ff41;
+            background: #00000000;
+            color: #00ff41;
+            font-size: 0.99rem; /* Або вкажіть точний розмір інших лінків, наприклад: 16px */
+            font-family: inherit; /* Копіює шрифт (monospace) з меню */
+            text-transform: none;
+            text-decoration: underline;
+            text-align: center;
+            padding: 0px;
+        }
+        .buttone:hover {
+            background-color: #00ff41;
+            color: #0a0a0a;
+        }
+        </style>
+        <p><a href="/" id = "1t">Home</a> <a href="/about" id = "2t">About</a> <span class = "trans" id = "3t">i am chineese</span></p>
+        <script>
+            function translatet(){
+                for (let i=1; i<4;i++){
+                    let selected = document.getElementById(`${i.toString()}t`);
+                    selected.innerHTML = data['top'][selector.value][i-1]
+                }
+            }
+        </script>
     </div>
     <div class="container">
         <div class="footnote">
@@ -93,7 +122,11 @@
         <p id="2"class="do_write">> Connection established...</p>
         <p id="3" class="do_write">> Status: <span style="color: white;">Online</span></p>
         <p id="4" class="do_write">> Welcome to the bases for our feelings<span class="cursor">_</span></p>
-        <input type="text" id="search" name="fname">
+        <input type="text" id="search" name="fname" list="searche">
+        <datalist id = "searche">
+            <option value="en">
+            <option value="ua">
+        </datalist>
     </div>
     <!-- <div style="margin-top: 20px; font-size: 0.8em;">
         © 2026 all rights reserved.
@@ -105,19 +138,23 @@
             let index = 0
             let contents = []
             let selector = document.getElementById("items")
-            let lange = document.cookie.split("; ").find(row => row.startsWith("language=")).split("=")[1]
+            if (localStorage.getItem("language") === null) {
+                lange = "en"
+            } else {
+                lange = localStorage.getItem("language")
+            }
             
             async function setselector() {
-                let lange = document.cookie.split(";").find(row => row.startsWith("language="))
-                if (lange === undefined) {
+                let lange = localStorage.getItem("language")
+                if (lange === null) {
                     return;
                 } else {
-                    selector.value = lange.split("=")[1]
+                    selector.value = lange
                 }
             }
             
             async function onchange() {
-                document.cookie = `language=${selector.value};path=/`;
+                localStorage.setItem("language", selector.value)
                 translate()
             }
             selector.addEventListener("change", onchange)
@@ -130,10 +167,11 @@
             }
             function translate(){
                 selector = document.getElementById("items")
-                for (let i=1; i<7;i++){
+                for (let i=1; i<5;i++){
                     let selected = document.getElementById(i.toString());
                     selected.innerHTML = data['index'][selector.value][i-1]
                 }
+                translatet()
             }
             function setcontents(){
                 for (let i=1; i<5;i++){
@@ -189,7 +227,7 @@
             }
 
             async function executeInOrder() {
-                if (lange == []) {
+                if (lange == [] | lange == undefined) {
                     selector.value = "en"
                 } else {
                     selector.value = lange

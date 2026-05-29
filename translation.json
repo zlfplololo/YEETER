@@ -4,17 +4,13 @@
             "yeeter",
             "Connection established...",
             "Status: <span style=\"color: white;\" id = \"5\">Online</span>",
-            "Welcome to the bases for our feelings<span class=\"cursor\">_</span>",
-            "Home",
-            "About"
+            "Welcome to the bases for our feelings<span class=\"cursor\">_</span>"
         ],
         "ua":[
             "їттер",
             "Пiдключення встановленно...",
             "Статус: <span style=\"color: white;\" id = \"5\">Онлайн</span>",
-            "Добро пожалувати до баз для наших емоцiй <span class=\"cursor\">_</span>",
-            "Додому",
-            "О"
+            "Добро пожалувати до баз для наших емоцiй <span class=\"cursor\">_</span>"
         ]
     },
     "error":{
@@ -81,6 +77,18 @@
             "о",
             "це просто школьний проект, нiчого про нас",
             "Додому"
+        ]
+    },
+    "top": {
+        "en":[
+            "Home",
+            "About",
+            "<a href=\"\/login\" id = \"6\">Login</a> <a href=\"\/register\" id = \"6\">Register</a>"
+        ],
+        "ua":[
+            "Додому",
+            "О",
+            "<a href=\"\/login\" id = \"6\">Вход</a> <a href=\"\/register\" id = \"6\">Зареєструватися</a>"
         ]
     }
 }
