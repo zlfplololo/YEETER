@@ -83,12 +83,12 @@
         "en":[
             "Home",
             "About",
-            "<a href=\"\/login\" id = \"6\">Login</a> <a href=\"\/register\" id = \"6\">Register</a>"
+            ["<a href=\"\/login\" id = \"6\">Login</a> <a href=\"\/register\" id = \"6\">Register</a>", "user: UAT <button onclick=\"logout()\" class = \"buttone\">Logout</button>"]
         ],
         "ua":[
             "Додому",
             "О",
-            "<a href=\"\/login\" id = \"6\">Вход</a> <a href=\"\/register\" id = \"6\">Зареєструватися</a>"
+            ["<a href=\"\/login\" id = \"6\">Вход</a> <a href=\"\/register\" id = \"6\">Зареєструватися</a>", "користувач: UAT <button onclick=\"logout()\" class = \"buttone\">Вихід</button>"]
         ]
     }
 }

@@ -48,6 +48,21 @@ while True:
                     ).encode("utf-8")
                     response = headers + content
                     client_socket.sendall(response)
+            if data.decode().split('\n')[0].split(' ')[1] == '/UATS':
+                table = sqlite3.connect('data.db')
+                cursor = table.cursor()
+                cursor.execute("SELECT at FROM users")
+                resulte = cursor.fetchall()
+                response_body = json.dumps([i[0] for i in resulte]).encode("utf-8")
+                headers = (
+                    "HTTP/1.1 200 OK\n"
+                    "Content-Type: application/json\n"
+                    f"Content-Length: {len(response_body)}\n"
+                    "Access-Control-Allow-Origin: *\n"
+                    "Connection: close\n\n"
+                ).encode("utf-8")
+                response = headers + response_body
+                client_socket.sendall(response)
             if data.decode().split('\n')[0].split(' ')[1] == '/translate':
                 print("yes")
                 with open(f"translation.json", "rb") as f:
