@@ -30,7 +30,7 @@
             border: 2px solid #00ff41;
             padding: 20px;
             box-shadow: 0 0 15px #00ff41;
-            background: rgba(0, 40, 0, 0.1);
+            background: rgba(9, 13, 9, 1);
             text-align: center;
         }
         .footnote {
@@ -41,14 +41,14 @@
         input {
             border: 2px solid #00ff41;
             box-shadow: 0 0 15px #00ff41;
-            background: rgba(0, 40, 0, 0.1);
+            background: rgba(9, 13, 9, 1);
             text-align: center;
             color:#00ff41;
         }
         select {
             border: 2px solid #00ff41;
             box-shadow: 0 0 15px #00ff41;
-            background: rgba(0, 40, 0, 0.1);
+            background: rgba(9, 13, 9, 1);
             text-align: center;
             color:#00ff41;
         }
@@ -73,7 +73,7 @@
         .containerN {
             border: 2px solid #00ff41;
             box-shadow: 0 0 15px #00ff41;
-            background: rgba(0, 40, 0, 0.1);
+            background: rgba(9, 13, 9, 1);
             text-align: center;
         }
         .top {
@@ -150,6 +150,13 @@
             let index = 0
             let contents = []
             let selector = document.getElementById("items")
+            let field = document.getElementById("search")
+            field.addEventListener("keydown", redirect)
+            function redirect(event) {
+                if (event.key == "Enter") {
+                    window.location.href = `/page?user=${field.value}`
+                }
+            }
             if (localStorage.getItem("language") === null) {
                 lange = "en"
             } else {
@@ -157,8 +164,8 @@
             }
             async function getusers() {
                 let response = await fetch("UATS")
-                data = await response.json()
-                console.log(data)
+                let data = await response.json()
+                return data
             }
             
             async function setselector() {
@@ -176,10 +183,12 @@
                 translate()
             }
             selector.addEventListener("change", onchange)
-            async function fetchtranslate() {
+            async function fetchtranslation() {
                 let response = await fetch("translate")
-                data = await response.json()
-                console.log(data)
+                let datat = await response.json()
+                data = datat
+            }
+            async function fetchtranslate() {
                 await translate()
                 await setcontents()
             }
@@ -198,12 +207,20 @@
                     target.innerHTML = ""
                 }
             }
+            async function setfield() {
+                let placeholder = "<option value=\"UAT\">@UAT</option>"
+                let field = await document.getElementById('searche')
+                field.innerHTML = ""
+                for(i of await getusers()) {
+                    field.innerHTML += placeholder.replace("UAT", i).replace("@UAT", `@${i}`)
+                }
+            }
             
             function typeMessage(elementId) {
                 return new Promise((resolve) => {
                     let target = document.getElementById(elementId);
                     if (!target) { resolve(); return; }
-
+                    
                     
                     let temp = document.createElement('div');
                     temp.innerHTML = contents[elementId-1]; 
@@ -239,12 +256,13 @@
                             }
                         }
                     }
-
+                    
                     typeNode(temp, target).then(resolve);
                 });
             }
-
+            
             async function executeInOrder() {
+                await fetchtranslation()
                 if (lange == [] | lange == undefined) {
                     selector.value = "en"
                 } else {
@@ -252,14 +270,14 @@
                 }
                 await setselector()
                 await fetchtranslate()
-                let field = document.getElementById("search")
                 field.value = ""
                 for (let i = 1; i < 5; i++) {
                     await typeMessage(i.toString());
                 }
+                setfield()
             }
-
+            
             window.onload = executeInOrder;
-    </script>
+            </script>
 </body>
 </html>

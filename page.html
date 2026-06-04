@@ -12,7 +12,6 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
         }
         /* The "Scanline" effect */
         body::before {
@@ -44,12 +43,90 @@
             background-color: #00ff41;
             color: #0a0a0a;
         }
+        .containerCenter {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            align-items: center;
+        }
+        .containerE {
+            display: flex;
+            border: 2px solid #00ff41;
+            padding: 20px;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(9, 13, 9, 1);
+            width: 100vw;
+            box-sizing: border-box;
+        }
+        .containerG {
+            padding: 10px;
+            text-align: center;
+            display: grid;
+            box-sizing: border-box;
+            grid-template-columns: auto 1fr; /* PFP takes its own width, text takes the rest */
+            column-gap: 10px;
+            row-gap: 10px;
+            width: 10%;
+        }
+        .fir {
+            grid-row: span 2;
+            align-self: top;
+        }
+        .sec {
+            grid-column: 2;
+        }
+        select {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(9, 13, 9, 1);
+            text-align: center;
+            color: #00ff41;
+        }
+        .belllottie {
+            width: 2.5cm;
+            height: 2.5cm;
+        }
+        .invisiblebutton {
+            border: 0px solid #00ff4100;
+            background: #00000000;
+            color: #00ff41;
+        }
+        hr {
+            color: #00ff41;
+        }
+        .container hr {
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+        spin {
+            white-space: pre;
+            display: inline;
+        }
+        .pfp {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+        .dive {
+            display: none;
+        }
         h1 { text-transform: uppercase; letter-spacing: 5px; }
         .cursor { animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
+    <div class = 'dive' id = "tempales">
+        <div class="container" id = "posttemplate">
+            <span style="display:flex;">
+                <span style="display: flex; align-items: center; justify-content: start;"><span id = "post_pic">PFP</span><spin>  </spin><spin id = "post_name">UN</spin></span>
+                <spin>  </spin>
+                <span style="display: flex; align-items: center; justify-content: end;"><button class="buttone" id = "3">follow</button></span>
+            </span>
+            <hr>
+            <p id = "post_content">POST</p>
+        </div>
+    </div>
     <div class="top containerN">
         <style>
         .containerN {
@@ -105,26 +182,77 @@
             }
         </script>
     </div>
+    <div class="containerE">
+        <span class="containerG">
+            <spin class = "fir" id = "pic">PFP</spin>
+            <spin class = "sec" id = "name">UN</spin>
+            <spin class = "sec" id = "UAT">@UAT</spin>
+        </span>
+        <span class="containerCenter">
+            <spin class="containerCenter"><spin id = "1">followers</spin>: <spin id="followers">FOLLOWERCOUNT</spin></spin>
+            <span class="containerCenter">
+                <button id = "bell" class="belllottie invisiblebutton"></button>
+                <spin> </spin>
+                <button class="buttone" id = "2">follow</button>
+            </span>
+        </span>
+    </div>
     <div class="container">
-        <div class="footnote"><a href="/errore" id = "1">this page also has a joke page</a></div>
-        <h1 id = "2">error 404 not found</h1>
-        <p><a href="/" id = "3">Go Home</a></p>
+        <spin id = "description">DESC</spin>
+    </div>
+    <p></p>
+    <div class="containerE" style="justify-content: center;" id = "postspace">
     </div>
     <!-- <div style="margin-top: 20px; font-size: 0.8em;">
         © 2026 all rights reserved.
     </div> -->
+        <script type="module">
+            import { marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
+            import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify/dist/purify.es.mjs';
+            function converttoHTML(value) {
+                return DOMPurify.sanitize(marked.parse(value))
+            }
+            window.converttoHTML = converttoHTML
+            window.sanitize = DOMPurify.sanitize
+        </script>
         <script>
+            async function getbellsound() {
+                let raw = await fetch("assets/bellsound")
+                let blob = await raw.blob()
+                let tempURL = await URL.createObjectURL(blob)
+                let audio = new Audio(tempURL)
+                return audio
+            }
+            let lottieweb = import('https://esm.sh/lottie-web');
             let data = 0
             let message = 0
             let target = 0
             let index = 0
             let contents = []
+            let bellsound = getbellsound()
             if (localStorage.getItem("language") === null) {
                 lange = "en"
             } else {
                 lange = localStorage.getItem("language")
             }
-            
+
+            async function getinfo() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const userValue = await urlParams.get('user'); 
+                let dataraw =  await fetch(`userdata/${userValue}`)
+                let data = await dataraw.json()
+                console.log(data)
+                document.getElementById("name").innerHTML = await sanitize(data[1])
+                document.getElementById("UAT").innerHTML = await `@${sanitize(data[2])}`
+                if (data[3] === null){
+                    document.getElementById("description").innerHTML = await {en: converttoHTML("**THIS USER HAS NO DESCRIPTION**"), ua: converttoHTML("**ЦЕЙ КОРИСТУВАЧ НЕ МАЄ ОПИСУ**")}[lange] 
+                } else {
+                    document.getElementById("description").innerHTML = await converttoHTML(data[3])
+                }
+                document.getElementById("followers").innerHTML = data[4]
+                document.getElementById("pic").innerHTML = `<img class = "pfp" src = "assets/PFP's/${data[0]}">`
+            }
+
             async function fetchtranslate() {
                 let response = await fetch("translate")
                 data = await response.json()
@@ -135,7 +263,7 @@
                 selector = document.getElementById("items")
                 for (let i=1; i<4;i++){
                     let selected = document.getElementById(i.toString());
-                    selected.innerHTML = data['error'][lange][i-1]
+                    selected.innerHTML = data['page'][lange][i-1]
                 }
                 translatet()
             }
@@ -146,7 +274,29 @@
                     target.innerHTML = ""
                 }
             }
-            
+            async function ye_olde_bell() {
+                bell = document.getElementById("bell")
+                animationaddress =  await fetch("assets/bell")
+                animation = await animationaddress.json()
+                locallottie = await lottieweb
+                animationinuse = locallottie.default.loadAnimation({
+                    container: document.getElementById("bell"),
+                    renderer: "svg",
+                    loop:false,
+                    autoplay:false,
+                    animationData:animation,
+                    rendererSettings: {
+                        preserveAspectRatio: 'xMidYMid meet' // Scales uniformally to fit
+                        // Use 'xMidYMid slice' to zoom and fill the container completely
+                    }
+                })
+                //0>~70>~175>225
+                bell.addEventListener("click", async function() {
+                    let bellsounde = await bellsound 
+                    bellsounde.play()
+                    animationinuse.playSegments([0,225], true)
+                })
+            }
             function typeMessage(elementId) {
                 return new Promise((resolve) => {
                     let target = document.getElementById(elementId);
@@ -195,6 +345,8 @@
             
             async function executeInOrder() {
                 await fetchtranslate()
+                ye_olde_bell()
+                getinfo()
             }
 
             window.onload = executeInOrder;

@@ -4,6 +4,7 @@ import json
 import sqlite3
 # 1. Create a socket (AF_INET = IPv4, SOCK_STREAM = TCP)
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 # 2. Bind to an address and port
 server_socket.bind(('0.0.0.0', 8080))
@@ -21,7 +22,7 @@ while True:
         # 5. Receive and send data
         data = client_socket.recv(1024)
         if not data:
-            break
+            continue
         print(f"Received: {data.decode()}")
         if re.match(r"GET /",data.decode().split('\n')[0]):
             if data.decode().split('\n')[0].split(' ')[1] == "/":
@@ -36,7 +37,7 @@ while True:
                     ).encode("utf-8")
                     response = headers + content
                     client_socket.sendall(response)
-            if data.decode().split('\n')[0].split(' ')[1] == '/favicon.ico':
+            elif data.decode().split('\n')[0].split(' ')[1] == '/favicon.ico':
                 with open(f"favicon.ico", "rb") as f:
                     content = f.read()
                     headers = (
@@ -48,7 +49,7 @@ while True:
                     ).encode("utf-8")
                     response = headers + content
                     client_socket.sendall(response)
-            if data.decode().split('\n')[0].split(' ')[1] == '/UATS':
+            elif data.decode().split('\n')[0].split(' ')[1] == '/UATS':
                 table = sqlite3.connect('data.db')
                 cursor = table.cursor()
                 cursor.execute("SELECT at FROM users")
@@ -63,8 +64,7 @@ while True:
                 ).encode("utf-8")
                 response = headers + response_body
                 client_socket.sendall(response)
-            if data.decode().split('\n')[0].split(' ')[1] == '/translate':
-                print("yes")
+            elif data.decode().split('\n')[0].split(' ')[1] == '/translate':
                 with open(f"translation.json", "rb") as f:
                     content = f.read()
                     headers = (
@@ -76,7 +76,87 @@ while True:
                     ).encode("utf-8")
                     response = headers + content
                     client_socket.sendall(response)
-            if re.match(r"(\/(?!(favicon\.ico)|(translate)).+)",data.decode().split('\n')[0].split(' ')[1]):
+            elif data.decode().split('\n')[0].split(' ')[1] == '/assets/bell':
+                with open(f"assets/bell.json", "rb") as f:
+                    content = f.read()
+                    headers = (
+                        "HTTP/1.1 200 OK\n"
+                        "Content-Type: application/json\n"
+                        f"Content-Length: {len(content)}\n"
+                        "Connection: close\n"
+                        "\n"
+                    ).encode("utf-8")
+                    response = headers + content
+                    client_socket.sendall(response)
+            elif data.decode().split('\n')[0].split(' ')[1] == '/assets/bellsound':
+                with open(f"assets/bellsound.mp3", "rb") as f:
+                    content = f.read()
+                    headers = (
+                        "HTTP/1.1 200 OK\n"
+                        "Content-Type: audio/mpeg\n"
+                        f"Content-Length: {len(content)}\n"
+                        "Connection: close\n"
+                        "\n"
+                    ).encode("utf-8")
+                    response = headers + content
+                    client_socket.sendall(response)
+            elif re.match(r"(\/assets\/PFP's\/.+)",data.decode().split('\n')[0].split(' ')[1]):
+                try:
+                    with open(data.decode().split('\n')[0].split(' ')[1][1:], "rb") as f:
+                        content = f.read()
+                        headers = (
+                            "HTTP/1.1 200 OK\n"
+                            "Content-Type: image/jpeg\n"
+                            f"Content-Length: {len(content)}\n"
+                            "Connection: close\n"
+                            "\n"
+                        ).encode("utf-8")
+                        response = headers + content
+                        client_socket.sendall(response)
+                except Exception:
+                    with open("assets/error.png", "rb") as f:
+                        content = f.read()
+                        headers = (
+                            "HTTP/1.1 200 OK\n"
+                            "Content-Type: image/jpeg\n"
+                            f"Content-Length: {len(content)}\n"
+                            "Connection: close\n"
+                            "\n"
+                        ).encode("utf-8")
+                        response = headers + content
+                        client_socket.sendall(response)
+            elif re.match(r"(\/page\?user=.*)",data.decode().split('\n')[0].split(' ')[1]):
+                with open("page.html", "rb") as f:
+                    content = f.read()
+                    headers = (
+                        "HTTP/1.1 200 OK\n"
+                        "Content-Type: text/html; charset=utf-8\n"
+                        f"Content-Length: {len(content)}\n"
+                        "Connection: close\n"
+                        "\n"
+                    ).encode("utf-8")
+                    response = headers + content
+                    client_socket.sendall(response)
+            elif re.match(r"\/userdata\/.*",data.decode().split('\n')[0].split(' ')[1]):
+                table = sqlite3.connect('data.db')
+                cursor = table.cursor()
+                cursor.execute("SELECT pfp, name, at, description FROM users WHERE at = ?", (data.decode().split('\n')[0].split(' ')[1].split("/")[2],))
+                resulte = cursor.fetchall()
+                cursor.execute('SELECT following FROM users')
+                following = len([i for i in cursor.fetchall() if data.decode().split('\n')[0].split(' ')[1].split("/")[2] in json.loads(i[0])])
+                cursor.execute('SELECT * FROM posts WHERE at = ?', (data.decode().split('\n')[0].split(' ')[1].split("/")[2],))
+                posts = cursor.fetchall()
+                response_body = json.dumps(list(resulte[0])+[following]+[posts]).encode("utf-8")
+                headers = (
+                    "HTTP/1.1 200 OK\n"
+                    "Content-Type: application/json\n"
+                    f"Content-Length: {len(response_body)}\n"
+                    "Access-Control-Allow-Origin: *\n"
+                    "Connection: close\n\n"
+                ).encode("utf-8")
+                response = headers + response_body
+                client_socket.sendall(response)
+            elif re.match(r"(\/.+)",data.decode().split('\n')[0].split(' ')[1]):
                 try:
                     with open(f".{data.decode().split('\n')[0].split(' ')[1]}.html", "rb") as f:
                         content = f.read()
@@ -107,7 +187,7 @@ while True:
                 try:
                     table = sqlite3.connect('data.db')
                     cursor = table.cursor()
-                    cursor.execute("INSERT INTO users (at, name, password) VALUES (?,?,?)", (action['name'], action['name'], action['password']))
+                    cursor.execute("INSERT INTO users (at, name, password, following, pfp, description, notifications, notificated) VALUES (?,?,?,?,?,?,?,?)", (action['name'], action['name'], action['password'], "[]", "standart.png", None, "[]", "[]"))
                     table.commit()
                     
                     response_body = {"status": 1, "error": "None"}
@@ -189,5 +269,8 @@ while True:
     except Exception as e:
         print(type(e).__qualname__ + str(e))
         server_socket.close()
-        table.close()
+        try:
+            table.close()
+        except NameError:
+            pass
         break

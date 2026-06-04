@@ -12,7 +12,7 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden;
+
         }
         /* The "Scanline" effect */
         body::before {
@@ -31,7 +31,11 @@
             padding: 20px;
             box-shadow: 0 0 15px #00ff41;
             background: rgba(9, 13, 9, 1);
-            text-align: center; /* Add this to center the link */
+            text-align: center;
+        }
+        .container .footnote {
+            text-align: right;
+            font-size: 9px;
         }
         a {
             color: #00ff41; /* Force it to stay green */
@@ -39,6 +43,30 @@
         a:hover {
             background-color: #00ff41;
             color: #0a0a0a;
+        }
+        hr {
+            color: #00ff41;
+        }
+        .container hr {
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+        spin {
+            white-space: pre;
+            display: inline;
+        }
+        .containerR {
+            display: flex;
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(9, 13, 9, 1);
+            text-align: center;
+            justify-content: center;
+        }
+        .output {
+            max-height: 200px;    /* Stops the box from growing vertically */
+            overflow-y: auto;     /* Adds a vertical scrollbar only when text overflows */
         }
         h1 { text-transform: uppercase; letter-spacing: 5px; }
         .cursor { animation: blink 1s infinite; }
@@ -88,7 +116,7 @@
                         if (localStorage.getItem("UAT") == null) {
                             selected.innerHTML = data['top'][lange][i-1][0]
                         } else {
-                        selected.innerHTML = data['top'][lange][i-1][1].replace('UAT', localStorage.getItem("UAT"))
+                            selected.innerHTML = data['top'][lange][i-1][1].replace('UAT', localStorage.getItem("UAT"))
                         }
                     } else {
                         selected.innerHTML = data['top'][lange][i-1]
@@ -102,35 +130,98 @@
         </script>
     </div>
     <div class="container">
-        <h1 id = "2">error 107 page found</h1>
+        <h2>your text</h2>
+        <textarea class="containerR" style="color: #00ff41; height:30px;" id = "input"></textarea>
+        <hr>
+        <h2>display</h2>
+        <div class="container output">
+            <spin id = "render"></spin>
+        </div>
+        <hr>
+        <span style="display:flex;align-items:center;justify-content:center;">
+            <button class="containerN" style="color:#00ff41;" onclick='exec_button("underline")'><u>A</u></button>
+            <button class="containerN" style="color:#00ff41;" onclick='exec_button("stroke")'><s>U</s></button>
+            <button class="containerN" style="color:#00ff41;" onclick='exec_button("italic")'><i>A</i></button>
+            <button class="containerN" style="color:#00ff41;" onclick='exec_button("bold")'><b>A</b></button>
+            <button class="containerN" style="color:#00ff41;" onclick='exec_button("color")'><span style="color:magenta;">A</span></button>
+            <button class="containerN" style="color:#00ff41;" onclick='exec_button("link")'><u>link</u></button>
+            <button class="containerN" style="color:#00ff41;" onclick='exec_button("image")'><img src="assets/PFP's/standart.png"></button>
+        </span>
     </div>
-    <div style="margin-top: 20px; font-size: 0.8em; ">
-        <!-- © 2026 all rights reserved. <br> -->
-        <p id = "1">🎩 this page is a joke. to visit the real page click <a href="/error">here</a></p>
-    </div>
-    <script>
+    <!-- <div style="margin-top: 20px; font-size: 0.8em;">
+        © 2026 all rights reserved.
+    </div> -->
+        <script type="module">
+            import { marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
+            import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify/dist/purify.es.mjs';
+            function converttoHTML(value) {
+                return DOMPurify.sanitize(marked.parse(value))
+            }
+            window.converttoHTML = converttoHTML
+            window.sanitize = DOMPurify.sanitize
+        </script>
+        <script>
             let data = 0
             let message = 0
             let target = 0
             let index = 0
+            let textarea = document.getElementById("input")
+            textarea.addEventListener("input", execute_render)
+            let render = document.getElementById("render")
             let contents = []
             if (localStorage.getItem("language") === null) {
                 lange = "en"
             } else {
                 lange = localStorage.getItem("language")
             }
-            
+
+            function exec_button(action) {
+                let tag = 0
+                let tag2 = 0
+                if (action == "underline") {
+                    tag = "<u>"
+                    tag2 = "</u>"
+                }
+                if (action == "stroke") {
+                    tag = "~~"
+                    tag2 = "~~"
+                }   
+                if (action == "italic"){
+                    tag = "_"
+                    tag2 = "_"
+                }
+                if (action == "bold"){
+                    tag = "**"
+                    tag2 = "**"
+                }
+                if(action == "color"){
+                    tag = `<span style="color:magenta;">`
+                    tag2 = "</span>"
+                }
+                if(action == "link"){   
+                    tag = "["
+                    tag2 = "](https://example.com)"
+                }
+                if (action == "image"){
+                    tag = ""
+                    tag2 = `<img src="assets/PFP's/standart.png">`
+                }    
+                textarea.value = `${textarea.value.slice(0,textarea.selectionStart)}${tag}${textarea.value.slice(textarea.selectionStart,textarea.selectionEnd)}${tag2}${textarea.value.slice(textarea.selectionEnd, textarea.value.length)}`
+                execute_render()
+            }
+            function execute_render(){
+                render.innerHTML = converttoHTML(textarea.value)
+            }
             async function fetchtranslate() {
                 let response = await fetch("translate")
                 data = await response.json()
-                console.log(data)
-                await translate()
+                await translatet()
             }
             function translate(){
                 selector = document.getElementById("items")
-                for (let i=1; i<3;i++){
+                for (let i=1; i<4;i++){
                     let selected = document.getElementById(i.toString());
-                    selected.innerHTML = data['errore'][lange][i-1]
+                    selected.innerHTML = data['error'][lange][i-1]
                 }
                 translatet()
             }
@@ -190,6 +281,7 @@
             
             async function executeInOrder() {
                 await fetchtranslate()
+                execute_render()
             }
 
             window.onload = executeInOrder;
