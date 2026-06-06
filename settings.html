@@ -142,19 +142,19 @@
     </div>
     <div class="container" id = "mainwindow">
         <span style="display: flex; align-items: center; justify-content: center;"><span id="pic">PFP</span><span id="picname">image name</span></span>
-        <button class="buttone" onclick="{document.getElementById('secectpic').style.display='block'; getoptions();}">select new...</button>
+        <button class="buttone" onclick="{document.getElementById('secectpic').style.display='block'; getoptions();}" id="1">select new...</button>
         <br>
         <br>
-        <span>displayed name:</span><input type="text" id = "name"class="input">
-        <h2 id = 1>Description</h2>
+        <span id="2">displayed name:</span><input type="text" id = "name"class="input">
+        <h2 id = 3>Description</h2>
         <textarea class="containerR" style="color: #00ff41; height:30px;" id = "input"></textarea>
         <hr>
-        <h2 id = 2>Display</h2>
+        <h2 id = 4>Display</h2>
         <div class="container output">
             <spin id = "render"></spin>
         </div>
         <hr>
-        <button class="buttone" onclick="send()">update</button>
+        <button class="buttone" onclick="send()" id = 5>update</button>
     </div>
     <div class="popup container" style="display: none;" id = "secectpic">
         <span id="picselect">PFP</span>
@@ -162,9 +162,9 @@
 
         </select>
         <hr>
-        <button class="buttone" onclick="changepic(document.getElementById('picselection').value)">done</button> <br>
-        <span>or</span><br>
-        <input type="file" id = "image"><button>upload</button>
+        <button class="buttone" onclick="changepic(document.getElementById('picselection').value)"id=6>done</button> <br>
+        <span id =7>or</span><br>
+        <input type="file" id = "image"><button id = 8 class="buttone" onclick="sendpic()">upload</button>
     </div>
     <!-- <div style="margin-top: 20px; font-size: 0.8em;">
         © 2026 all rights reserved.
@@ -221,13 +221,13 @@
                 let response = await fetch("translate")
                 data = await response.json()
                 console.log(data)
-                await translatet()
+                await translate()
             }
             function translate(){
                 selector = document.getElementById("items")
-                for (let i=1; i<4;i++){
+                for (let i=1; i<9;i++){
                     let selected = document.getElementById(i.toString());
-                    selected.innerHTML = data['error'][lange][i-1]
+                    selected.innerHTML = data['settings'][lange][i-1]
                 }
                 translatet()
             }
@@ -286,7 +286,21 @@
                     typeNode(temp, target).then(resolve);
                 });
             }
-
+            async function sendpic() {
+                picker = document.getElementById("image")
+                if (picker.files.length > 0) {
+                    let file = picker.files[0];
+                    let formData = new FormData();
+                    formData.append('incomingFile', file);
+                    formData.append('name', file.name);
+                    jsonformdata = Object.fromEntries(formData.entries())
+                    console.log(jsonformdata)
+                    let resultraw = await fetch('/upload', {
+                        method: 'POST',
+                        body: jsonformdata
+                    })
+                }
+            }
             async function changepic(value) {
                 document.getElementById("pic").innerHTML = `<img class = "pfp" src = "assets/PFP's/${value}">`
                 image = sanitize(value)
