@@ -68,6 +68,9 @@
             max-height: 200px;    /* Stops the box from growing vertically */
             overflow-y: auto;     /* Adds a vertical scrollbar only when text overflows */
         }
+        .error {
+            color: rgb(165, 36, 36);
+        }
         h1 { text-transform: uppercase; letter-spacing: 5px; }
         .cursor { animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
@@ -130,10 +133,10 @@
         </script>
     </div>
     <div class="container">
-        <h2>your text</h2>
+        <h2 id = 1>your text</h2>
         <textarea class="containerR" style="color: #00ff41; height:30px;" id = "input"></textarea>
         <hr>
-        <h2>display</h2>
+        <h2 id = 2>display</h2>
         <div class="container output">
             <spin id = "render"></spin>
         </div>
@@ -147,6 +150,8 @@
             <button class="containerN" style="color:#00ff41;" onclick='exec_button("link")'><u>link</u></button>
             <button class="containerN" style="color:#00ff41;" onclick='exec_button("image")'><img src="assets/PFP's/standart.png"></button>
         </span>
+        <p id="error" class="error"></p>
+        <button class = "buttone" onclick="send()" id = "3">post</button>
     </div>
     <!-- <div style="margin-top: 20px; font-size: 0.8em;">
         © 2026 all rights reserved.
@@ -165,6 +170,7 @@
             let message = 0
             let target = 0
             let index = 0
+            let editing = false
             let textarea = document.getElementById("input")
             textarea.addEventListener("input", execute_render)
             let render = document.getElementById("render")
@@ -209,19 +215,43 @@
                 textarea.value = `${textarea.value.slice(0,textarea.selectionStart)}${tag}${textarea.value.slice(textarea.selectionStart,textarea.selectionEnd)}${tag2}${textarea.value.slice(textarea.selectionEnd, textarea.value.length)}`
                 execute_render()
             }
+            async function send() {
+                if (localStorage.getItem("UAT") == null) {
+                    document.getElementById("error").innerHTML = {en:"Please log in first", ua:"будь ласка ввойдiть спочатку"}[lange]
+                } else {
+                    if (editing){
+                            let resulte = await fetch('/', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({"action": "post/edit", "id": await new URLSearchParams(window.location.search).get('id'), "content": textarea.value})
+                        })
+                    }
+                    else {
+                        let resulte = await fetch('/', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({"action": "post/post", "AT": localStorage.getItem("UAT"), "content": textarea.value})
+                        })
+                    }
+                }
+            }
             function execute_render(){
                 render.innerHTML = converttoHTML(textarea.value)
             }
             async function fetchtranslate() {
                 let response = await fetch("translate")
                 data = await response.json()
-                await translatet()
+                await translate()
             }
             function translate(){
                 selector = document.getElementById("items")
                 for (let i=1; i<4;i++){
                     let selected = document.getElementById(i.toString());
-                    selected.innerHTML = data['error'][lange][i-1]
+                    selected.innerHTML = data['post'][lange][i-1]
                 }
                 translatet()
             }
@@ -277,10 +307,22 @@
                     typeNode(temp, target).then(resolve);
                 });
             }
-
+            async function setup() {
+                let urlParams = new URLSearchParams(window.location.search);
+                let postid = await urlParams.get('id');
+                if (postid != null) {
+                    let shortinforaw = await fetch(`posts/${postid}`)
+                    let shortinfo = await shortinforaw.json()
+                    if (shortinfo[0] == localStorage.getItem("UAT")){
+                        editing = true
+                        textarea.value = shortinfo[1]
+                    }
+                }
+            }
             
             async function executeInOrder() {
                 await fetchtranslate()
+                await setup()
                 execute_render()
             }
 

@@ -82,25 +82,35 @@
     "page":{
         "en":[
             "followers",
-            "follow",
-            "follow"
+            ["follow", "unfollow"]
         ],
         "ua":[
             "пiдписники",
-            "пiдписатися",
-            "пiдписатися"
+            ["пiдписатися", "вiдписатися"]
+        ]
+    },
+    "post": {
+        "en":[
+            "Your text",
+            "Display",
+            "post"
+        ],
+        "ua":[
+            "Ваш текст",
+            "Вигляд",
+            "виложити"
         ]
     },
     "top": {
         "en":[
             "Home",
             "About",
-            ["<a href=\"\/login\" id = \"6\">Login</a> <a href=\"\/register\" id = \"6\">Register</a>", "user: UAT <button onclick=\"logout()\" class = \"buttone\">Logout</button>"]
+            ["<a href=\"\/login\" id = \"6\">Login</a> <a href=\"\/register\" id = \"6\">Register</a>", "user: UAT <button onclick=\"logout()\" class = \"buttone\">Logout</button> <a href=\"\/post\">Make a post</a> <a href=\"\/edit\">edit posts</a> <a href=\"\/settings\">settings</a>"]
         ],
         "ua":[
             "Додому",
             "О",
-            ["<a href=\"\/login\" id = \"6\">Вход</a> <a href=\"\/register\" id = \"6\">Зареєструватися</a>", "користувач: UAT <button onclick=\"logout()\" class = \"buttone\">Вихід</button>"]
+            ["<a href=\"\/login\" id = \"6\">Вход</a> <a href=\"\/register\" id = \"6\">Зареєструватися</a>", "користувач: UAT <button onclick=\"logout()\" class = \"buttone\">Вихід</button> <a href=\"\/post\">Зроби пост</a> <a href=\"\/edit\">редагувати пости</a> <a href=\"\/settings\">налаштування</a>"]
         ]
     }
 }

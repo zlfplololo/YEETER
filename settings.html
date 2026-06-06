@@ -40,33 +40,44 @@
         a {
             color: #00ff41; /* Force it to stay green */
         }
-        input {
-            border: 2px solid #00ff41;
-            box-shadow: 0 0 5px #00ff41;
-            background: rgba(9, 13, 9, 1);
-            text-align: center;
-            color:#00ff41;
-        }
-        button {
-            border: 2px solid #00ff41;
-            box-shadow: 0 0 5px #00ff41;
-            background: rgba(9, 13, 9, 1);
-            text-align: center;
-            color:#00ff41;
-        }
-        button:hover {
-            background-color: #00ff41;
-            color: #0a0a0a;
-        }
         a:hover {
             background-color: #00ff41;
             color: #0a0a0a;
         }
-        .error {
-            color: rgb(165, 36, 36);
+        .containerR {
+            display: flex;
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            box-shadow: 0 0 15px #00ff41;
+            background: rgba(9, 13, 9, 1);
+            text-align: center;
+            justify-content: center;
         }
-        .trans {
-            display: inline;
+        hr {
+            color: #00ff41;
+        }
+        .container hr {
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+        .pfp {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+        }
+        .input {
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 5px #00ff41;
+            background: rgba(9, 13, 9, 1);
+            text-align: center;
+            color:#00ff41;
+        }
+        .popup {
+            position: absolute;
+            top:25%;
+            left:25%;
+            width: 50%;
+            height: 50%;
         }
         h1 { text-transform: uppercase; letter-spacing: 5px; }
         .cursor { animation: blink 1s infinite; }
@@ -129,89 +140,94 @@
             }
         </script>
     </div>
-    <div class="container">
-        <h1 id = "1">login</h1>
-        <p><div id = "2" class = "trans">Name:</div> <input type="text" id="name" name="fname"></p>
-        <p><div id = "3" class = "trans">Password:</div> <input type="password" id="Password" name="fname"><input type="checkbox" id="show" class=""></p>
-        <p><div id = "4" class = "trans">Repeat password:</div> <input type="password" id="Passwordrepeat" name="fname"></p>
-        <p id="error" class="error"></p>
-        <Button onclick="send()" id = "5">login</Button>
+    <div class="container" id = "mainwindow">
+        <span style="display: flex; align-items: center; justify-content: center;"><span id="pic">PFP</span><span id="picname">image name</span></span>
+        <button class="buttone" onclick="{document.getElementById('secectpic').style.display='block'; getoptions();}">select new...</button>
+        <br>
+        <br>
+        <span>displayed name:</span><input type="text" id = "name"class="input">
+        <h2 id = 1>Description</h2>
+        <textarea class="containerR" style="color: #00ff41; height:30px;" id = "input"></textarea>
+        <hr>
+        <h2 id = 2>Display</h2>
+        <div class="container output">
+            <spin id = "render"></spin>
+        </div>
+        <hr>
+        <button class="buttone" onclick="send()">update</button>
+    </div>
+    <div class="popup container" style="display: none;" id = "secectpic">
+        <span id="picselect">PFP</span>
+        <select id="picselection">
 
+        </select>
+        <hr>
+        <button class="buttone" onclick="changepic(document.getElementById('picselection').value)">done</button> <br>
+        <span>or</span><br>
+        <input type="file" id = "image"><button>upload</button>
     </div>
     <!-- <div style="margin-top: 20px; font-size: 0.8em;">
         © 2026 all rights reserved.
     </div> -->
+        <script type="module">
+            import { marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js';
+            import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify/dist/purify.es.mjs';
+            function converttoHTML(value) {
+                return DOMPurify.sanitize(marked.parse(value))
+            }
+            window.converttoHTML = converttoHTML
+            window.sanitize = DOMPurify.sanitize
+        </script>
         <script>
             let data = 0
             let message = 0
             let target = 0
             let index = 0
             let contents = []
+            let image = ""
+            let textarea = document.getElementById("input")
+            textarea.addEventListener("input", execute_render)
             if (localStorage.getItem("language") === null) {
                 lange = "en"
             } else {
                 lange = localStorage.getItem("language")
             }
-            let checkbox = document.getElementById("show")
-            checkbox.addEventListener("change", show)
-            function show() {
-                let password = document.getElementById("Password")
-                let repeat = document.getElementById("Passwordrepeat")
-                if (password.type == "password"){
-                    password.type = "text"
-                    repeat.type = "text"
-                } else {
-                    password.type = "password"
-                    repeat.type = "password"
+
+            async function getoptions() {
+                let resultraw = await fetch("PFP's")
+                let result = await resultraw.json()
+                document.getElementById("picselection").innerHTML = ""
+                for (i of result) {
+                    document.getElementById("picselection").insertAdjacentHTML('beforeend', `<option value="${i}">${i}</option>`)
                 }
+                onchange()
             }
-            
+            document.getElementById("picselection").addEventListener('change', onchange)
+            function onchange() {
+                document.getElementById("picselect").innerHTML = `<img class="pfp" src="assets/PFP's/${document.getElementById("picselection").value}">`
+            }
+
             async function send() {
-                let name = document.getElementById("name")
-                let password = document.getElementById("Password")
-                let repeat = document.getElementById("Passwordrepeat")
-                let errorbox = document.getElementById("error")
-                if (password.value == repeat.value) {
                     let resulte = await fetch('/', {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({"action": "account/login", "name": name.value, "password": password.value})
+                        body: JSON.stringify({"action": "user/update status", "pfp":image, "name": document.getElementById("name").value, "description": textarea.value, "at":localStorage.getItem("UAT")})
                     })
-                    console.log(resulte)
-                    let result = await resulte.json()
-                    console.log(result)
-                    if (result["status"] == 1) {
-                        errorbox.textContent = ""
-                        localStorage.setItem('UAT', name.value)
-                        translatet()
-                        window.location.href = "/"
-                    } else {
-                        switch (result['error']) {
-                            case ("w/p"):
-                                errorbox.textContent = {en: "Wrong password, please try again!", ua: "Непривельний пароль, будьласка, повторiть знову"}[lange]
-                                break;
-                            case ("n/u"):
-                                errorbox.textContent = {en: "No user exists, please try again!", ua: "Немає корисутвача, будьласка зпробуйте знову"}[lange]
-                                break;
-                        }
-                    }
-                } else {
-                    errorbox.textContent = "password not matching"
-                }
             }
+            
             async function fetchtranslate() {
                 let response = await fetch("translate")
                 data = await response.json()
                 console.log(data)
-                await translate()
+                await translatet()
             }
             function translate(){
                 selector = document.getElementById("items")
-                for (let i=1; i<6;i++){
+                for (let i=1; i<4;i++){
                     let selected = document.getElementById(i.toString());
-                    selected.innerHTML = data['login'][lange][i-1]
+                    selected.innerHTML = data['error'][lange][i-1]
                 }
                 translatet()
             }
@@ -221,6 +237,9 @@
                     contents.push(target.innerHTML)
                     target.innerHTML = ""
                 }
+            }
+            function execute_render(){
+                render.innerHTML = converttoHTML(textarea.value)
             }
             
             function typeMessage(elementId) {
@@ -268,10 +287,32 @@
                 });
             }
 
+            async function changepic(value) {
+                document.getElementById("pic").innerHTML = `<img class = "pfp" src = "assets/PFP's/${value}">`
+                image = sanitize(value)
+                document.getElementById("picname").innerHTML = value
+                document.getElementById("secectpic").style.display = "none"
+            }
+            async function setup() {
+                if (localStorage.getItem("UAT") == null) {
+                    document.getElementById("mainwindow").innerHTML = {en: "<p style=\"color:red;\">Please login fist</p>", ua:"<p style=\"color:red;\">будьласка ввойдiть спочатку</p>"}[lange]
+                } else {
+                    let dataraw =  await fetch(`userdata/${localStorage.getItem("UAT")}`)
+                    let data = await dataraw.json()
+                    console.log(data)
+                    document.getElementById("pic").innerHTML = `<img class = "pfp" src = "assets/PFP's/${data[0]}">`
+                    image = sanitize(data[0])
+                    document.getElementById("picname").innerHTML = data[0]
+                    document.getElementById("name").value = sanitize(data[1])
+                    document.getElementById("image").value  = ''
+                    textarea.value = data[3]
+                }
+            }
             
             async function executeInOrder() {
-                document.getElementById("show").checked = false;
+                setup()
                 await fetchtranslate()
+                execute_render()
             }
 
             window.onload = executeInOrder;

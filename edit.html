@@ -122,9 +122,10 @@
     <template class = 'dive' id = "post">
         <div class="container post">
             <span style="display:flex;">
+                <id class="dive" id="id"></id>
                 <span style="display: flex; align-items: center; justify-content: start;"><span id = "post_pic">PFP</span><spin>  </spin><spin id = "post_name">UN</spin></span>
                 <spin>  </spin>
-                <span style="display: flex; align-items: center; justify-content: end; width: 100%;"><button class="buttone" id = "followbutton" onclick="sendfollowrequest()">follow</button></span>
+                <span style="display: flex; align-items: center; justify-content: end; width: 100%;"><button class="buttone" id = "editbutton">edit</button><spin>  </spin><button class="buttone" id = "deletebutton">delete</button></span>
             </span>
             <hr>
             <p id = "post_content">POST</p>
@@ -185,27 +186,9 @@
             }
         </script>
     </div>
-    <div class="containerE">
-        <span class="containerG">
-            <spin class = "fir" id = "pic">PFP</spin>
-            <spin class = "sec" id = "name">UN</spin>
-            <spin class = "sec" id = "UAT">@UAT</spin>
-        </span>
-        <span class="containerCenter">
-            <spin class="containerCenter"><spin id = "1">followers</spin>: <spin id="followers">FOLLOWERCOUNT</spin></spin>
-            <span class="containerCenter">
-                <button id = "bell" class="belllottie invisiblebutton"></button>
-                <spin> </spin>
-                <button class="buttone" id = "2" onclick="sendfollowrequest()">follow</button>
-            </span>
-        </span>
-    </div>
-    <div class="container">
-        <spin id = "description">DESC</spin>
-    </div>
-    <p></p>
     <div class="containerE" style="justify-content: center;flex-direction: column; row-gap: 20px; align-items: center;" id = "postspace">
     </div>
+    <p style="color: red;" id = "error"></p>
     <!-- <div style="margin-top: 20px; font-size: 0.8em;">
         © 2026 all rights reserved.
     </div> -->
@@ -233,9 +216,27 @@
                 return data[6]
             }
             async function getuservalue(){
-                let urlParams = new URLSearchParams(window.location.search);
-                let userValue = await urlParams.get('user');
-                return userValue 
+                return await localStorage.getItem("UAT") 
+            }
+            async function deletepost(id) {
+                let resultraw = await fetch('/', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({"action": "post/delete", "id":id})
+                })
+                let result = resultraw.json()
+                if (result["status"] == 0) {
+                    switch (result[error]) {
+                        case "n/p":
+                            document.getElementById("error").innerHTML = {en: "No post/Post already deleted", ua:"Немає поста/пост вже видален"}[lange]
+                            break;
+                    }
+                }
+            }
+            async function editpost(id) {
+                window.location.href = `/post?id=${id}`
             }
             function TFIO(value) {
                 if (value) {
@@ -274,11 +275,10 @@
                     },
                     body: JSON.stringify({"action": "user/follow", "AT": localStorage.getItem("UAT"), "who": who})
                 })
-                translate()
                 updatefollowercount()
                 updatefollowstatusonposts()
             }
-            async function makepost(at, content){
+            async function makepost(id, at, content){
                 let template = document.getElementById("post")
                 let clone = template.content.cloneNode(true)
                 let shortinforaw = await fetch(`usershort/${at}`)
@@ -286,9 +286,9 @@
                 clone.getElementById("post_pic").innerHTML = `<img class = "pfp" src = "assets/PFP's/${shortinfo[0]}">`
                 clone.getElementById("post_name").innerHTML =  await sanitize(shortinfo[1])
                 clone.getElementById("post_content").innerHTML = await converttoHTML(content)
-                let SBCT = await getsubscribedto()
-                let UV = await getuservalue()
-                clone.getElementById("followbutton").innerHTML = data["page"][lange][1][TFIO(SBCT.includes(UV))]
+                clone.getElementById("id").innerHTML = `${id}`
+                clone.getElementById("editbutton").addEventListener("click", ()=>{editpost(id)})
+                clone.getElementById("deletebutton").addEventListener("click", ()=>{deletepost(id)})
                 return clone
             }
             async function updatefollowercount() {
@@ -301,28 +301,17 @@
                 const userValue = await getuservalue(); 
                 let dataraw =  await fetch(`userdata/${userValue}`)
                 let data = await dataraw.json()
-                console.log(data)
-                document.getElementById("name").innerHTML = await sanitize(data[1])
-                document.getElementById("UAT").innerHTML = await `@${sanitize(data[2])}`
-                if (data[3] === null){
-                    document.getElementById("description").innerHTML = await {en: converttoHTML("**THIS USER HAS NO DESCRIPTION**"), ua: converttoHTML("**ЦЕЙ КОРИСТУВАЧ НЕ МАЄ ОПИСУ**")}[lange] 
-                } else {
-                    document.getElementById("description").innerHTML = await converttoHTML(data[3])
-                }
-                document.getElementById("followers").innerHTML = data[4]
-                document.getElementById("pic").innerHTML = `<img class = "pfp" src = "assets/PFP's/${data[0]}">`
                 for (i of data[5]) {
                     console.log(i)
-                    document.getElementById("postspace").append(await makepost(data[2], i[2]))
+                    document.getElementById("postspace").append(await makepost(i[0], data[2], i[2]))
                 }
-                subscribedto = data[6]
             }
 
             async function fetchtranslate() {
                 let response = await fetch("translate")
                 data = await response.json()
                 console.log(data)
-                await translate()
+                await translatet()
             }
             async function translate(){
                 selector = document.getElementById("items")
@@ -355,7 +344,7 @@
                     renderer: "svg",
                     loop:false,
                     autoplay:false,
-                    animationData:animation[0],
+                    animationData:animation,
                     rendererSettings: {
                         preserveAspectRatio: 'xMidYMid meet' // Scales uniformally to fit
                         // Use 'xMidYMid slice' to zoom and fill the container completely
@@ -416,7 +405,6 @@
             async function executeInOrder() {
                 await fetchtranslate()
                 getinfo()
-                ye_olde_bell()
             }
 
             window.onload = executeInOrder;
